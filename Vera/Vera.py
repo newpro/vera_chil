@@ -1,5 +1,7 @@
 '''
 this is the communication unit between program and vera 
+
+Vera class is used for communicate, e.g poll state, and inhert by other class
 '''
 
 #-----------------locate boardcast IP------------------
@@ -52,7 +54,7 @@ class Vera:
         get status information of all vera devices in system
         return: unparsed json file, and parse
         """
-        self.resp = requests.get("http://" + str(self.vera_ip) + ":" + str(self.vera_port) + "/data_request?id=lu_status").json()
+        self.resp = requests.get("http://" + str(self.vera_ip) + ":" + str(self.vera_port) + "/data_request?id=lu_status").json()    
     
     def get_wave_status(self, update = True):
         '''
@@ -64,6 +66,4 @@ class Vera:
             update_vera_status()
         return self.resp["ZWaveStatus"]
 
-#test
-#myvera = Vera()
-#print myvera.get_wave_status()
+command_url = "http://192.168.0.100:3480/data_request?id=lu_action&output_format=json&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=1"
