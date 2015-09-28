@@ -87,6 +87,13 @@ class Comm:
                 result = result + "&serviceId=urn:upnp-org:serviceId:Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" + _s(new_value)
             else:
                 raise Exception("action type not supported")
+        else if (request_type == "variableget"):
+            #http://192.168.0.100:3480/data_request?id=variableget&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status
+            result += "id=variableget"
+            result = result + "DeviceNum=" + _s(device_id) + "&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status"
+        
+                
+        
     
     
                 
