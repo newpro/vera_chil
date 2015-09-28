@@ -92,9 +92,3 @@ class Comm:
             result += "id=variableget"
             result = result + "DeviceNum=" + _s(device_id) + "&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status"
         
-                
-        
-    
-    
-                
-        

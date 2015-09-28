@@ -1,7 +1,10 @@
 from Device import Device
 
-
 class Switch(Device):
+    """
+    A switch instance represent a switch device
+    inhert from device class, link to a vera instance
+    """
     def __init__(self, vera, device_id):
         Device.__init__(self, vera, device_id)
         self.device_id = device_id

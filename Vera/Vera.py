@@ -39,10 +39,14 @@ def find_vera(vera_port = 49451):
         if timeout_time > 10: #more than 10 secs scan time, probably something goes wrong
             raise Exception("CRITICAL: timeout quota reached, no Vera find\nVera do this sometime, u might want to try later.")
 
-#_______________________parse UML data_________________________
 import requests
-#import xml.etree.ElementTree as ET
 class Vera:
+    """
+    A Vera instance represent a Vera network (a Vera Router)
+    the reason to isolate the class is to allow the user to connect to multiple Vera Network at the same time
+    
+    Other class passin a Vera instance on creation to link to the network
+    """
     #hardcode info
     def __init__(self, vera_ip = "192.168.0.100", vera_port = 49451):
         self.vera_ip = vera_ip
