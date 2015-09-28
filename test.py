@@ -14,5 +14,5 @@ myvera = v.Vera()
 print myvera.get_wave_status(update=False) #get if the wave is alive
 
 from Vera import Switch as s
-light1 = s.Switch(14)
+light1 = s.Switch(myvera, 14)
 light1.info()
