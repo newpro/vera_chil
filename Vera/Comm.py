@@ -15,6 +15,8 @@ class Comm:
         2. status
         3. device
         4. room
+        _____lua control_____
+        5. action
     """
 
     #command_url = "http://192.168.0.100:3480/data_request?id=lu_action&output_format=json&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=1"
@@ -66,4 +68,26 @@ class Comm:
                 result = result + "&action=delete&room=" + _s(room)
             else:
                 raise Exception("CRITICAL: room request type does not match")
+        else if (request_type == "action"):
+            result += "id=action&output_format=json"            
+            if (device_id=="lights"): #Aziz, light!
+                result += "&Category=999"
+            else if (device_id == "dimmable lights"):
+                result += "&Category=2"
+            else if (device_id == "binary lights"):
+                result += "&Category=3"
+            else:
+                result = result + "&DeviceNum=" + _s(device_id)
+            #support turn/dimm
+            if(action == "turn"):
+                #&DeviceNum=6&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=0
+                result = result + "&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=" + _s(new_value)
+            else if (action == "dimm"):
+                #&DeviceNum=7&serviceId=urn:upnp-org:serviceId:Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=30
+                result = result + "&serviceId=urn:upnp-org:serviceId:Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" + _s(new_value)
+            else:
+                raise Exception("action type not supported")
+    
+    
+                
         
