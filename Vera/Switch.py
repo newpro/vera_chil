@@ -1,5 +1,6 @@
 from Device import Device
 
+
 class Switch(Device):
     
     #
@@ -7,6 +8,9 @@ class Switch(Device):
         Device.__init__(self, device_id, vera_ip=vera_ip, vera_port=vera_port)
         self.device_id = device_id
         self.device_type = __name__
+        
+    def on(self):
+        pass
     
     def info(self):
         print "--------SWITCH INFO---------"
