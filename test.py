@@ -11,9 +11,10 @@ from Vera import Vera as v
 
 #Create a Vera Network first for connection
 myvera = v.Vera()
-print myvera.get_wave_status(update=False) #get if the wave is alive
+#print myvera.get_wave_status(update=False) #get if the wave is alive
 
 #Add a switch to the network
 from Vera import Switch as s
 light1 = s.Switch(myvera, 14)
-light1.info()
+#light1.info()
+light1.vera.comm.poll()

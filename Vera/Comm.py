@@ -1,5 +1,11 @@
 import requests
 
+#check if the variable is not empty. if it is, raise exception  
+def _s(var):
+    if var == None: 
+        raise Exception("undefined variable, throw from Comm")
+    return str(var)
+
 class Comm:
     """
     This is the communication module for all classes
@@ -21,60 +27,52 @@ class Comm:
 
     #command_url = "http://192.168.0.100:3480/data_request?id=lu_action&output_format=json&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=1"
     
-    def __init__(self, service, device_id, vera_ip="192.168.0.100", vera_port=49451):
+    def __init__(self, vera_ip="192.168.0.100", vera_port=49451):
         self.vera_ip = vera_ip
         self.vera_port = vera_port
-        self.device_id = device_id
-        self.service = service
-    
-    #check if the variable is not empty. if it is, raise exception
-    def _s(var):
-        if var == None:
-            raise ("CRITICAL: variable feed error, from _url_gen")
-        else:
-            return str(var)
     
     #hardcoded url generator    
     def _url_gen(self, request_type, device_id=None, action = None, new_value=None, room=None):
-        result = "http://" + self.vera_ip + ":" + self.vera_port + "/data_request?"
+        result = "http://" + _s(self.vera_ip) + ":" + _s(self.vera_port) + "/data_request?"
         
         if(request_type == "user_data"):
             result += "id=user_data&output_format=json"
             
-        else if (request_type == "status"):
+        elif (request_type == "status"):
             result +="id=status&output_format=json"
             result = result + "&DeviceNum=" + _s(device_id)
                 
-        else if (request_type == "device"):
+        elif (request_type == "device"):
             result += "id=device"
             #action have to be rename/delete
             if(action == "rename"):
                 #example: &action=rename&device=5&name=Chandalier&room=Garage
                 result = result + "&action=rename" + "&device=" + _s(device_id) + "&name" + _s(new_value) + "&room=" + _s(room)
-            else if (action == "delete"):
+            elif (action == "delete"):
                 #example: action=delete&device=5
                 result = result + "&action=delete&device=" + _s(device_id)
             else:
                 raise Exception("CRITICAL: device request type does not match!!!")
             
-        else if (request_type == "room"):
+        elif (request_type == "room"):
             result += "id=room"
             #action is create/rename/delete
             if(action == "create"):
                 result = result + "&action=create&name=" + _s(new_value)
-            else if (action == "rename"):
+            elif (action == "rename"):
                 result = result + "&action=rename&room=" + _s(room) + "&name=" + _s(new_value)
-            else if (action == "delete"):
+            elif (action == "delete"):
                 result = result + "&action=delete&room=" + _s(room)
             else:
                 raise Exception("CRITICAL: room request type does not match")
-        else if (request_type == "action"):
+            
+        elif (request_type == "action"):
             result += "id=action&output_format=json"            
             if (device_id=="lights"): #Aziz, light!
                 result += "&Category=999"
-            else if (device_id == "dimmable lights"):
+            elif (device_id == "dimmable lights"):
                 result += "&Category=2"
-            else if (device_id == "binary lights"):
+            elif (device_id == "binary lights"):
                 result += "&Category=3"
             else:
                 result = result + "&DeviceNum=" + _s(device_id)
@@ -82,13 +80,24 @@ class Comm:
             if(action == "turn"):
                 #&DeviceNum=6&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=0
                 result = result + "&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=" + _s(new_value)
-            else if (action == "dimm"):
+            elif (action == "dimm"):
                 #&DeviceNum=7&serviceId=urn:upnp-org:serviceId:Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=30
                 result = result + "&serviceId=urn:upnp-org:serviceId:Dimming1&action=SetLoadLevelTarget&newLoadlevelTarget=" + _s(new_value)
             else:
                 raise Exception("action type not supported")
-        else if (request_type == "variableget"):
+            
+        elif (request_type == "variableget"):
             #http://192.168.0.100:3480/data_request?id=variableget&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status
             result += "id=variableget"
-            result = result + "DeviceNum=" + _s(device_id) + "&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status"
-        
+            result = result + "&DeviceNum=" + _s(device_id) + "&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status"
+            
+        return result
+    
+    #--------------call specific level (wapper)-------------------
+    
+    #Request full information, prase and return
+    def poll(self):
+        url = self._url_gen("user_data")
+        resp = requests.get(url).json()
+        print url
+        print resp["devices"][1]

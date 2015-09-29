@@ -9,10 +9,13 @@ from subprocess import Popen, PIPE
 import time
 from os import setsid
 
+#command_url = "http://192.168.0.100:3480/data_request?id=lu_action&output_format=json&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=1"
+
 def find_vera(vera_port = 49451):
     '''
     this function give the vera ip in the network
-    this function is intended to call only once! 
+    !!!WARNING: this function is unstable, due to the nature of UPNP call can block for variaous reasons!!!!
+    So: this function is intended to call only once! and as less as possible
     Because Vera have delay, and sometime not even responed, that is why this function is not in class
     Once find, vera IP do not change easily. unless rebot or others
     '''
@@ -40,6 +43,8 @@ def find_vera(vera_port = 49451):
             raise Exception("CRITICAL: timeout quota reached, no Vera find\nVera do this sometime, u might want to try later.")
 
 import requests
+from Comm import Comm
+
 class Vera:
     """
     A Vera instance represent a Vera network (a Vera Router)
@@ -52,6 +57,17 @@ class Vera:
         self.vera_ip = vera_ip
         self.vera_port = vera_port
         self.resp = requests.get("http://" + str(vera_ip) + ":" + str(vera_port) + "/data_request?id=lu_status").json()
+        self.comm = Comm(vera_ip, vera_port) #bind a communication channel
+    
+    #this function is called when there is major configuration change to cause change of IP
+    #or cause the change of IP
+    def refetch_ip(): 
+        new_ip = ""
+        try:
+            new_ip = find_vera() #this function is unstable
+        except:
+            print "WARNING: Locate fail, retry later"
+        self.vera_ip = new_ip #if u can survive the try, u r right
     
     def update_vera_status(self, vera_ip, vera_port):
         """
@@ -60,7 +76,7 @@ class Vera:
         """
         self.resp = requests.get("http://" + str(self.vera_ip) + ":" + str(self.vera_port) + "/data_request?id=lu_status").json()    
     
-    def get_wave_status(self, update = True):
+    def status(self, update = True):
         '''
         check if the wave is alive
         Option: -update: if true then repoll the status
@@ -68,6 +84,6 @@ class Vera:
         '''
         if(update == True):
             update_vera_status()
-        return self.resp["ZWaveStatus"]
-
-command_url = "http://192.168.0.100:3480/data_request?id=lu_action&output_format=json&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=1"
+        return self.resp["devices"]
+    
+    
