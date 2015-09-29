@@ -99,5 +99,24 @@ class Comm:
     def poll(self):
         url = self._url_gen("user_data")
         resp = requests.get(url).json()
-        print url
-        print resp["devices"][1]
+        
+        for device in resp["devices"]:
+            #print "T: " + device["device_type"]#[35:-2]
+            target = device["device_type"]
+            target = target.split(":")
+            
+            print "type:", target[3]
+            print "name:", device["name"]
+            print "id:", device["id"]
+            try:
+                print "room: ", device["room"]
+            except:
+                pass
+            
+            try:
+                print "par: ", device["id_parent"]
+            except:
+                pass
+            
+            print "-----------------------"
+            
