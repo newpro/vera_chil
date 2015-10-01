@@ -98,6 +98,7 @@ class Comm:
     #Request full information, prase and return
     def poll(self):
         url = self._url_gen("user_data")
+        print url
         resp = requests.get(url).json()
         
         for device in resp["devices"]:
@@ -125,6 +126,7 @@ class Comm:
         return the on/off status of one device
         """
         url = self._url_gen("variableget", device_id=device_id)
+        print url
         resp = requests.get(url).json()
         
         if (resp == 0):
@@ -133,4 +135,18 @@ class Comm:
         else:
             return True
     
+    def on(self, device_id):
+        """
+        Turn on the light
+        """
+        url = self._url_gen("action",action="turn",new_value=1,device_id=device_id)
+        resp = requests.get(url).json()
+        print "job", resp["u:SetTargetResponse"]["JobID"], "finished successful"
     
+    def off(self, device_id):
+        """
+        Turn off the light
+        """
+        url = self._url_gen("action",action="turn",new_value=0,device_id=device_id)
+        resp = requests.get(url).json()
+        print "job", resp["u:SetTargetResponse"]["JobID"], "finished successful"

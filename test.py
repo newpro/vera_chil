@@ -19,4 +19,10 @@ light1 = s.Switch(myvera, 14)
 #light1.info()
 #light1.vera.comm.poll()
 #light1.poll()
-print light1.status()
+#if (light1.status()):
+#    light1.on()
+
+if(not light1.status()):
+    light1.on()
+else:
+    light1.off()

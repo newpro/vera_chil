@@ -11,15 +11,18 @@ class Switch(Device):
         self.device_type = __name__
         
     def on(self):
-        pass
+        self.vera.comm.on(self.device_id)
+    
+    def off(self):
+        self.vera.comm.off(self.device_id)
     
     #call directly
     def poll(self):
         #self.vera.comm.poll()
-        raise Exception("not allow to raise the ")
+        raise Exception("not allow to poll other than Vera")
     
     def status(self):
-        self.vera.comm.status(self.device_id)
+        return self.vera.comm.status(self.device_id)
     
     def info(self):
         print "--------SWITCH INFO---------"
