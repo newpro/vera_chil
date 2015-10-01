@@ -13,6 +13,14 @@ class Switch(Device):
     def on(self):
         pass
     
+    #call directly
+    def poll(self):
+        #self.vera.comm.poll()
+        raise Exception("not allow to raise the ")
+    
+    def status(self):
+        self.vera.comm.status(self.device_id)
+    
     def info(self):
         print "--------SWITCH INFO---------"
         print "VERA NETWORK: ", self.vera.vera_ip, ":", self.vera.vera_port

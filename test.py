@@ -17,4 +17,6 @@ myvera = v.Vera()
 from Vera import Switch as s
 light1 = s.Switch(myvera, 14)
 #light1.info()
-light1.vera.comm.poll()
+#light1.vera.comm.poll()
+#light1.poll()
+print light1.status()

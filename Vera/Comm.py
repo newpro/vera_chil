@@ -119,4 +119,18 @@ class Comm:
                 pass
             
             print "-----------------------"
-            
+    
+    def status(self, device_id):
+        """
+        return the on/off status of one device
+        """
+        url = self._url_gen("variableget", device_id=device_id)
+        resp = requests.get(url).json()
+        
+        if (resp == 0):
+            return False
+        
+        else:
+            return True
+    
+    
