@@ -27,12 +27,12 @@ class Comm:
 
     #command_url = "http://192.168.0.100:3480/data_request?id=lu_action&output_format=json&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&action=SetTarget&newTargetValue=1"
     
-    def __init__(self, vera_ip="192.168.0.100", vera_port=49451):
+    def __init__(self, vera_ip="192.168.0.100", vera_port=3480):
         self.vera_ip = vera_ip
         self.vera_port = vera_port
     
     #hardcoded url generator    
-    def _url_gen(self, request_type, device_id=None, action = None, new_value=None, room=None):
+    def _url_gen(self, request_type, device_id=None, action = None, new_value=None, room=None, service=None):
         result = "http://" + _s(self.vera_ip) + ":" + _s(self.vera_port) + "/data_request?"
         
         if(request_type == "user_data"):
@@ -88,9 +88,13 @@ class Comm:
             
         elif (request_type == "variableget"):
             #http://192.168.0.100:3480/data_request?id=variableget&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status
+            #service can be "SwitchPower" or "DoorLock"
             result += "id=variableget"
-            result = result + "&DeviceNum=" + _s(device_id) + "&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status"
-            
+            if (service == "DoorLock"): #doorlock have specific service id
+                serviceId = "urn:micasaverde-com"
+            else :
+                serviceId = "urn:upnp-org"
+            result = result + "&DeviceNum=" + _s(device_id) + "&serviceId=" + serviceId +":serviceId:"+ _s(service) + "1&Variable=Status"
         return result
     
     #--------------call specific level (wapper)-------------------
@@ -121,12 +125,11 @@ class Comm:
             
             print "-----------------------"
     
-    def status(self, device_id):
+    def status(self, device_id, service):
         """
         return the on/off status of one device
         """
-        url = self._url_gen("variableget", device_id=device_id)
-        print url
+        url = self._url_gen("variableget", device_id=device_id, service=service)
         resp = requests.get(url).json()
         
         if (resp == 0):

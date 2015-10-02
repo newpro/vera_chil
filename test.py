@@ -15,14 +15,18 @@ myvera = v.Vera()
 
 #Add a switch to the network
 from Vera import Switch as s
+from Vera import Lock as l
 light1 = s.Switch(myvera, 14)
+lock1 = l.Lock(myvera, 11)
 #light1.info()
 #light1.vera.comm.poll()
 #light1.poll()
-#if (light1.status()):
-#    light1.on()
-
+'''
 if(not light1.status()):
     light1.on()
 else:
     light1.off()
+'''
+
+print light1.status()
+print lock1.status()

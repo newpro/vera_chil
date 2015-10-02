@@ -57,7 +57,7 @@ class Vera:
         self.vera_ip = vera_ip
         self.vera_port = vera_port
         self.resp = requests.get("http://" + str(vera_ip) + ":" + str(vera_port) + "/data_request?id=lu_status").json()
-        self.comm = Comm(vera_ip, vera_port) #bind a communication channel
+        self.comm = Comm(vera_ip, vera_port = 3480) #bind a communication channel
     
     #this function is called when there is major configuration change to cause change of IP
     #or cause the change of IP
