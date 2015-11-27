@@ -1,0 +1,289 @@
+// VARIABLES
+(variables
+	(light1  off  on )
+	(behaviour  nothing  other  turnOff_light1  turnOn_light1 )
+	(Af_light1_on  yes  no )
+	(Rn_light1_on  yes  no )
+)
+
+// OBSERVATIONS
+(observations
+	(light_switch  off  on )
+	(turn_light  no  yes )
+)
+unnormalised
+
+// SENSOR MODELS
+dd light_switchOF
+	(light1'  (off  (light_switch'  (off  (0.94999999))
+					(on  (0.050000001))))
+		(on  (light_switch'  (off  (0.050000001))
+					(on  (0.94999999)))))
+enddd
+dd turn_lightOF
+	(behaviour'  (nothing  (turn_light'  (no  (0.89999998))
+					(yes  (0.1))))
+		(other  (turn_light'  (no  (0.2))
+					(yes  (0.1))))
+		(turnOff_light1  (turn_light'  (no  (0.89999998))
+					(yes  (0.1))))
+		(turnOn_light1  (turn_light'  (no  (0.050000001))
+					(yes  (0.94999999)))))
+enddd
+
+// TIMEOUTS FOR BEHAVIOURS
+adjunct timeoutdd
+(behaviour (nothing (1000000))(other (1000000))(turnOff_light1 (1))(turnOn_light1 (1)) )
+
+// EFFECTS AND PRECONDITIONS OF BEHAVIOURS
+dd light1_dynamics
+(behaviour'  
+(nothing (SAMElight1))
+(other [+  (SAMElight1)  (0.05)])
+(turnOff_light1 (light1  (off  (light1off))
+	(on  (light1off))))
+(turnOn_light1 (light1  (off  (light1on))
+	(on  (light1on))))
+)
+enddd
+
+// BEHAVIOUR RELEVANCE FUNCTIONS (FOR BEHAVIOURS OTHER AND NOTHING ONLY)
+
+dd nothing_relevant
+(light1  (off  (0.0))
+	(on  (1.0)))
+enddd
+
+dd not_nothing_relevant
+[+ (1.0) [* (-1.0)   (nothing_relevant)]]
+enddd
+
+dd other_relevant
+(0.0)
+enddd
+
+dd not_other_relevant
+[+ (1.0) [* (-1.0)   (other_relevant)]]
+enddd
+
+
+// ROW RELEVANCE FUNCTIONS
+dd row1_relevant
+(light1  (off  (1.0))
+	(on  (0.0)))
+enddd
+
+dd not_row1_relevant
+	[+  (1.0)  [*  (-1.0)  (row1_relevant)]]
+enddd
+
+dd row1_relevant_b
+	[*  (row1_relevant)  (behaviourturnOn_light1)]
+enddd
+
+
+// ROW ABILITY RELEVANCE FUNCTIONS
+dd row1_ability_relevant
+	[*	(Af_light1_onyes)(Rn_light1_onyes)	]
+enddd
+
+dd not_row1_ability_relevant
+	[+	(1.0)	[*	(-1.0)	(row1_ability_relevant)]]
+enddd
+
+
+// PROBABILITIES OF GAINING/LOOSING ABILITIES AFTER PROMPTS AND SPONTANOUSLY
+dd gain_recall_Af_light1_on
+(0.69999999)
+enddd
+dd lose_recall_Af_light1_on
+(0.2)
+enddd
+dd gain_recall_Af_light1_on_prompt
+(0.94999999)
+enddd
+dd lose_recall_Af_light1_on_prompt
+(0.050000001)
+enddd
+dd gain_recall_Rn_light1_on
+(0.69999999)
+enddd
+dd lose_recall_Rn_light1_on
+(0.2)
+enddd
+dd gain_recall_Rn_light1_on_prompt
+(0.94999999)
+enddd
+dd lose_recall_Rn_light1_on_prompt
+(0.050000001)
+enddd
+dd stay_recall_Af_light1_on
+[+ (1.0)  [* (-1.0) (gain_recall_Af_light1_on)]]
+enddd
+dd keep_recall_Af_light1_on
+[+ (1.0)  [* (-1.0) (lose_recall_Af_light1_on)]]
+enddd
+dd stay_recall_Af_light1_on_prompt
+[+ (1.0)  [* (-1.0) (gain_recall_Af_light1_on_prompt)]]
+enddd
+dd keep_recall_Af_light1_on_prompt
+[+ (1.0)  [* (-1.0) (lose_recall_Af_light1_on_prompt)]]
+enddd
+dd stay_recall_Rn_light1_on
+[+ (1.0)  [* (-1.0) (gain_recall_Rn_light1_on)]]
+enddd
+dd keep_recall_Rn_light1_on
+[+ (1.0)  [* (-1.0) (lose_recall_Rn_light1_on)]]
+enddd
+dd stay_recall_Rn_light1_on_prompt
+[+ (1.0)  [* (-1.0) (gain_recall_Rn_light1_on_prompt)]]
+enddd
+dd keep_recall_Rn_light1_on_prompt
+[+ (1.0)  [* (-1.0) (lose_recall_Rn_light1_on_prompt)]]
+enddd
+
+// INITIAL STATES
+dd light1_initial
+(light1 (off (0.94999999)) (on (0.050000001)) )
+enddd
+dd behaviour_initial
+(1.0)
+enddd
+
+// INITIAL ABILITIES
+dd Af_light1_on_initial
+(Af_light1_on  (yes  (0.5))  (no  (0.5)))
+enddd
+dd Rn_light1_on_initial
+(Rn_light1_on  (yes  (0.5))  (no  (0.5)))
+enddd
+
+// ACTION COSTS (PROMPTING)
+dd donothing_cost  (0.0)   enddd
+dd prompt_Af_light1_on_cost
+(10.0)
+enddd
+dd prompt_Rn_light1_on_cost
+(10.0)
+enddd
+
+// REWARD
+reward 
+(light1  (off  (0.0))
+	(on  (300.0)))
+discount	0.95
+
+// INITIAL STATE
+init  [*
+(light1_initial)
+(behaviour_initial)
+(Af_light1_on_initial)
+(Rn_light1_on_initial)
+]
+
+// ADJUNCT GOAL
+adjunct goaldd
+(light1  (off  (0.0))
+	(on  (1.0)))
+
+// JOINT STATES WHERE BEHAVIOURS ARE IMPOSSIBLE
+// 1 means that behaviour is not possible in a given state and 0 means that behaviour is possible in a given state
+dd impossibleBeh
+(behaviour'  
+(nothing    
+(0.0)
+)
+(other    
+(0.0)
+)
+(turnOff_light1    
+(light1  (off  (1.0))
+	(on  (0.0))))
+(turnOn_light1    
+(light1  (off  (0.0))
+	(on  (1.0))))
+)
+enddd
+
+// ADDITIONAL RELATIONSHIPS FOR BEHAVIOURS
+dd randomBehConst   (0.01)  enddd
+dd genericBehDyn
+	[+   
+		[*   (behaviournothing)    (nothing_relevant)]
+		[*   (randomBehConst) [+  (1.0)  [*   (-1.0)  (impossibleBeh)]]]
+		(SAMEbehaviour)
+	]
+enddd
+dd notgenericBehDyn   [+	(1.0)	[*	(-1.0)	(genericBehDyn)]]  enddd
+dd fullBehDyn
+[+
+	(genericBehDyn)
+			[+
+				[*	(row1_ability_relevant)		(row1_relevant_b)	]
+				[*	(not_row1_ability_relevant)		(row1_relevant)	(behaviournothing)	]
+				[*	(not_row1_relevant)	(behaviournothing)]
+			]
+]
+enddd
+
+// NEW STYLE FOR ABILITY DYNAMICS
+dd Af_light1_on_dynamics
+(Af_light1_on(yes  (Af_light1_on'  (yes   (keep_recall_Af_light1_on))  (no   (lose_recall_Af_light1_on))))
+        (no   (Af_light1_on'  (yes   (gain_recall_Af_light1_on))  (no   (stay_recall_Af_light1_on)))))
+enddd
+dd Af_light1_on_prompt_dynamics
+(Af_light1_on(yes  (Af_light1_on'  (yes   (keep_recall_Af_light1_on_prompt))  (no   (lose_recall_Af_light1_on_prompt))))
+        (no   (Af_light1_on'  (yes   (gain_recall_Af_light1_on_prompt))  (no   (stay_recall_Af_light1_on_prompt)))))
+enddd
+dd Rn_light1_on_dynamics
+(Rn_light1_on(yes  (Rn_light1_on'  (yes   (keep_recall_Rn_light1_on))  (no   (lose_recall_Rn_light1_on))))
+        (no   (Rn_light1_on'  (yes   (gain_recall_Rn_light1_on))  (no   (stay_recall_Rn_light1_on)))))
+enddd
+dd Rn_light1_on_prompt_dynamics
+(Rn_light1_on(yes  (Rn_light1_on'  (yes   (keep_recall_Rn_light1_on_prompt))  (no   (lose_recall_Rn_light1_on_prompt))))
+        (no   (Rn_light1_on'  (yes   (gain_recall_Rn_light1_on_prompt))  (no   (stay_recall_Rn_light1_on_prompt)))))
+enddd
+
+// ACTION DEFINITIONS
+
+action donothing
+	light1    (light1_dynamics)
+	behaviour	(fullBehDyn)
+	Af_light1_on    (Af_light1_on_dynamics)
+	Rn_light1_on    (Rn_light1_on_dynamics)
+	observe
+		light_switch    (light_switchOF)
+		turn_light    (turn_lightOF)
+	endobserve
+	cost  (donothing_cost)
+endaction
+
+action prompt_Af_light1_on
+	light1    (light1_dynamics)
+	behaviour	(fullBehDyn)
+	Af_light1_on    (Af_light1_on_prompt_dynamics)
+	Rn_light1_on    (Rn_light1_on_dynamics)
+	observe
+		light_switch    (light_switchOF)
+		turn_light    (turn_lightOF)
+	endobserve
+	cost  (prompt_Af_light1_on_cost)
+endaction
+
+action prompt_Rn_light1_on
+	light1    (light1_dynamics)
+	behaviour	(fullBehDyn)
+	Af_light1_on    (Af_light1_on_dynamics)
+	Rn_light1_on    (Rn_light1_on_prompt_dynamics)
+	observe
+		light_switch    (light_switchOF)
+		turn_light    (turn_lightOF)
+	endobserve
+	cost  (prompt_Rn_light1_on_cost)
+endaction
+
+
+// TOLERANCE
+tolerance 0.05
+
+

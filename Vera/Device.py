@@ -2,6 +2,8 @@ from Vera import Vera
 '''
 This is abstract class, all devices inhert from this
 disallow create directly
+
+devices API is here: http://wiki.micasaverde.com/index.php/Luup_Devices
 '''
 
 class Device():
