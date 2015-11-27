@@ -9,7 +9,7 @@ public class MyClass {
 			while(s.equals("ENDOFMESSAGE")==false) {
 				//writer.println(s);
 				Thread.sleep(1000);
-				System.out.println("from python: " + s);
+				System.out.println("from python: " + s);//send to python
 				s = bufferRead.readLine();
 			}
 			//writer.close();
