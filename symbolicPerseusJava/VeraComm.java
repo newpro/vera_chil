@@ -2,16 +2,17 @@ import java.io.*;
 
 public class VeraComm {
 	private static BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+	
 	public static void send(String msg){
 		try{
-			System.out.println("from vera: " + msg);
+			System.out.println("DUMP: " + msg);//DUMP ensure it is a SNAP recommandation, not a info
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
 	}
 	
-	public static String receive(){
+	public static String readLine(){
 		String s = null;
 		try{
 			s = bufferRead.readLine();
@@ -23,12 +24,26 @@ public class VeraComm {
 	}
 	
 	//test
+	
 	public static void main(String[] args) {
 		while(true){
-			String s = receive();
-			if(s.equals("ENDOFMESSAGE")) break;
+			String s = readLine();
+			if(s.equals("ENDOPERATION")) {
+				send("SNAP end");
+				break;
+			}
 			send(s);
 		}
+		/*
+		String s = readLine();
+		send(s);
+		s = readLine();
+		if(s.equals("ENDOPERATION")) {
+			send("end here");
+		}
+		*/
 		return;
 	}
+	
+	
 }

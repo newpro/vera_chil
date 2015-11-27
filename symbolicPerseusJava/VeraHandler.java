@@ -4,7 +4,7 @@ import java.util.*;
 import java.lang.*;
 
 
-class Solver implements Serializable {
+class VeraHandler implements Serializable {
 
     // default values
     public static int nRounds = 5;
@@ -23,26 +23,6 @@ class Solver implements Serializable {
     public static boolean havepolicy=false;
     public static int nits=100;
     
-
-    public static void usage() {
-	    System.out.println("Usage: java Solver <spuddfile> [<flags>]");
-	    System.out.println("where: ");
-	    System.out.println("\t spuddfile (required): name of POMDP input file in SPUDD format");
-	    System.out.println("\t flags can be one of :");
-	    System.out.println("\t\t -g \t - generate policy");
-	    System.out.println("\t\t -i [filename]\t - read input policy from filename (default <spuddfile base name>.pomdp");
-	    System.out.println("\t\t\t\t   if -i is not given, the poilcy is generated and writted to <spuddfile base name>.pomdp)");
-	    System.out.println("\t\t -j \t - input contains multiple initial states as adjuncts and these should be used");
-	    System.out.println("\t\t -s <int>\t - do simulation for <int> iterations (with generated or read policy if available, or with user input if not");
-	    System.out.println("\t\t -b <int>\t - number of belief points to use [100]");
-	    System.out.println("\t\t -m <int>\t - max number of alpha vectors [100]");
-	    System.out.println("\t\t -t <int>\t - number of iterations of symbolic Perseus per round [30]");
-	    System.out.println("\t\t -e <int>\t - episode length to use when generating belief points [50]");
-	    System.out.println("\t\t -x <double>\t - exploration probability to use when generating belief points [0.4]");
-	    System.out.println("\t\t -h <double>\t - threshold for beliefs [0.001]");
-	    System.out.println("\t\t -r <int>\t - number of rounds to run [5]");
-	    
-    }
     public static void printDotDDs(POMDP pomdp) {
 	String fname; 
 	FileOutputStream f_out;
@@ -90,7 +70,6 @@ class Solver implements Serializable {
 	    int thearg=1;
 	    ioarg=args[thearg];
 	    while (numargs > 0 && ioarg.startsWith("-")) {
-		//System.out.println("numargs "+numargs+" thearg "+thearg+" ioarg "+ioarg);
 		if (ioarg.equals("-i"))  {
 		    if (numargs-1 > 0 &&  !(args[thearg+1].startsWith("-"))) {
 			iofile = args[thearg+1];
@@ -184,7 +163,7 @@ class Solver implements Serializable {
     }
     public static void main(String args[]) {
 	if (args.length < 1 || args[0].startsWith("-")) {
-	    usage();
+	    //usage();
 	    return;
 	}
 	String spuddfile = args[0];
@@ -193,7 +172,7 @@ class Solver implements Serializable {
 	// default output/input file
 	iofile = basename+".pomdp";
 	if (!parseArgs(args)) {
-	    usage();
+	    //usage();
 	    return;
 	}
 	if (generate) {
@@ -201,25 +180,10 @@ class Solver implements Serializable {
 
 	    POMDP pomdp = new POMDP(spuddfile,debug);
 
-	    //printDotDDs(pomdp);
-	    
-	    //DD goalDD = pomdp.getGoalDD();
-	    //goalDD.printSpuddDD(System.out);
-	    //boolean isgoal = pomdp.checkGoal(goalDD,pomdp.initialBelState,0.1);
-	    //System.out.println("is goal? "+isgoal);
-
 	    if (generate) {
 		pomdp.solve(nRounds, numBelStates, maxBelStates, episodeLength, threshold, explorProb, nIterations, maxAlphaSetSize, basename, multinits);
 	    }
-
-
-	    //double [] obsfit = pomdp.evaluateObservations(1);
-	    //for (int i =0; i<obsfit.length; i++) 
-	    //	System.out.println("fitness of "+i+":"+obsfit[i]);
-	    //double v0 = pomdp.evaluatePolicyStationary(30,30);
-	    //System.out.println("value is "+v0);
 	    
-	    // save fname version
 	    if (generate) {
 		FileOutputStream f_out;
 		try {
@@ -289,35 +253,7 @@ class Solver implements Serializable {
 		    // Cast object to a POMDP
 		    POMDP pomdp = (POMDP) obj;
 		    
-		    // Do something with pomdp
-		    //now we have to get all the global information and variable name
-		    // stuff from a file
-		    // this will stomp over some stuff in the above read, but works
 		    pomdp.readFromFile(spuddfile,debug);
-		    /*
-		    pomdp.actions[0].transFn[0].display();
-		    pomdp.actions[0].transFn[1].display();
-		    pomdp.actions[0].transFn[2].display();
-		    
-		    DD tmp = OP.mult(pomdp.actions[0].transFn[1],pomdp.actions[0].transFn[2]);
-		    tmp = OP.mult(tmp,pomdp.actions[0].obsFn[1]);
-		    tmp.display();
-		    */
-		    //pomdp.displayPolicy();
-		    //pomdp.addbeldiff = true;
-		    //System.out.println("addbeldiff is "+pomdp.addbeldiff);
-		    
-		    //    double [] obsfit = pomdp.evaluateObservations(1);
-		    //for (int i =0; i<obsfit.length; i++) 
-		    //System.out.println("fitness of "+i+":"+obsfit[i]);
-		    //double v0 = pomdp.evaluatePolicyStationary(30,30);
-		    //System.out.println("value is "+v0);
-
-
-		    // evaluate the policy
-		    //double polval = pomdp.evaluatePolicyStationary(1,100,true);
-		    //System.out.println("policy value is "+polval);
-		    
 		    
 		    // do simulation
 		    DD belState = pomdp.initialBelState;
@@ -330,44 +266,51 @@ class Solver implements Serializable {
 			    }
 		    }
 
-
 		    int actId,cactId;
 		    String [] obsnames = new String[pomdp.nObsVars];
 		    int nits = 100;
 		    String inobs,inact;  
 		    DD obsDist;
-		    InputStreamReader cin = new InputStreamReader(System.in);
-		    try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		    //BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			VeraComm vc = new VeraComm();
+			boolean VeraEnd = false;//if received a "ENDOPERATION" signal from Vera
 			
-			while (nits > 0) {
-			    System.out.println("current belief state: ");
-			    pomdp.printBeliefState(belState);
-			    actId = pomdp.policyQuery(belState,heuristic);
-			    System.out.println("action suggested by policy: "+actId+" which is "+pomdp.actions[actId].name);
-			    System.out.print("enter action to use:");
-			    inact = in.readLine();
-			    //System.out.println("here:"+inact+":end");
-			    cactId = pomdp.findActionByName(inact);
-			    if (cactId >= 0) {
-				actId = cactId;
+			while (nits > 0 || VeraEnd) {
+				    //System.out.println("current belief state: ");
+				    pomdp.printBeliefState(belState);
+				    actId = pomdp.policyQuery(belState,heuristic);
+				    System.out.println("action suggested by policy: "+actId+" which is "+pomdp.actions[actId].name);
+				    System.out.print("enter action to use:");
+				    
+				    //VVVVV1: actId, actionName
+				    //cancelled: only follow recommandation at this part
+				    
+				    //vc.send(actId + " " + pomdp.actions[actId].name);
+				    inact = vc.readLine();
+				    
+				    inact = "";//follow the recommadation
+				    
+				    cactId = pomdp.findActionByName(inact);
+				    if (cactId >= 0) {
+				    	actId = cactId;
 			    }
-			    System.out.println("action used: "+actId+" which is "+pomdp.actions[actId].name);
+			    //System.out.println("action used: "+actId+" which is "+pomdp.actions[actId].name);
+				//VVVVV2: confirm action##actId
+				    //cancelled: follow recommadation
+				    //vc.send(actId + "");
 			    
-			    // to see a distribution over observations given the belief state and the action selected
-			    //obsDist = OP.addMultVarElim(pomdp.concatenateArray(belState,pomdp.actions[actId].transFn,pomdp.actions[actId].obsFn), 
-			    //pomdp.concatenateArray(pomdp.varIndices,pomdp.primeVarIndices));
-			    //obsDist.display();
-
-
 			    for (int o=0; o<pomdp.nObsVars; o++) {
-				obsnames[o]=pomdp.obsVars[o].valNames[1];
-				System.out.print("enter observation "+pomdp.obsVars[o].name+" ["+obsnames[o]+"]: ");
-				inobs = in.readLine();
-				for (int k=0; k<pomdp.obsVars[o].arity; k++) {
-				    if (inobs.equalsIgnoreCase(pomdp.obsVars[o].valNames[k])) 
-					obsnames[o]=inobs;
-				}
+					obsnames[o]=pomdp.obsVars[o].valNames[1];
+					System.out.print("enter observation "+pomdp.obsVars[o].name+" ["+obsnames[o]+"]: ");
+					
+					//VVVVV3: observation### observe value, observe status 
+					vc.send(pomdp.obsVars[o].name + " " + obsnames[o]);
+					inobs = vc.readLine();
+					
+					for (int k=0; k<pomdp.obsVars[o].arity; k++) {
+					    if (inobs.equalsIgnoreCase(pomdp.obsVars[o].valNames[k]))
+					    	obsnames[o]=inobs;
+					}
 			    }
 			    System.out.print("observations: ");
 			    for (int o=0; o<pomdp.nObsVars; o++)
@@ -376,8 +319,6 @@ class Solver implements Serializable {
 			    belState = pomdp.beliefUpdate(belState,actId,obsnames);
 			    nits--;
 			}
-		    }  catch (IOException e) {
-		    }
 		    
 
 		} else {

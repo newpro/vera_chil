@@ -1,5 +1,11 @@
 import os
 from Vera import SnapComm
 
-comm = SnapComm.SnapComm()
-comm.write("hello there")
+sc = SnapComm.SnapComm(class_path = "./symbolicPerseusJava")
+sc.write("hello there")
+print "EDR:", sc.read()
+sc.write("hello there2")
+print "EDR:", sc.read()
+sc.write("hello there3")
+print "EDR:", sc.read()
+sc.end_communication()
