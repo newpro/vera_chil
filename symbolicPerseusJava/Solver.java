@@ -349,7 +349,7 @@ class Solver implements Serializable {
 			    inact = in.readLine();
 			    //System.out.println("here:"+inact+":end");
 			    cactId = pomdp.findActionByName(inact);
-			    if (cactId >= 0) {
+			    if (cactId >= 0) { 
 				actId = cactId;
 			    }
 			    System.out.println("action used: "+actId+" which is "+pomdp.actions[actId].name);

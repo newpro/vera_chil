@@ -270,51 +270,57 @@ class VeraHandler implements Serializable {
 		    String [] obsnames = new String[pomdp.nObsVars];
 		    int nits = 100;
 		    String inobs,inact;  
-		    DD obsDist;
+		    //DD obsDist;
 		    //BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			VeraComm vc = new VeraComm();
 			boolean VeraEnd = false;//if received a "ENDOPERATION" signal from Vera
 			
 			while (nits > 0 || VeraEnd) {
-				    //System.out.println("current belief state: ");
-				    pomdp.printBeliefState(belState);
-				    actId = pomdp.policyQuery(belState,heuristic);
-				    System.out.println("action suggested by policy: "+actId+" which is "+pomdp.actions[actId].name);
-				    System.out.print("enter action to use:");
-				    
-				    //VVVVV1: actId, actionName
-				    //cancelled: only follow recommandation at this part
-				    
-				    //vc.send(actId + " " + pomdp.actions[actId].name);
-				    inact = vc.readLine();
-				    
-				    inact = "";//follow the recommadation
-				    
-				    cactId = pomdp.findActionByName(inact);
-				    if (cactId >= 0) {
-				    	actId = cactId;
+			    //System.out.println("current belief state: ");
+			    pomdp.printBeliefState(belState);
+			    actId = pomdp.policyQuery(belState,heuristic);
+			    //System.out.println("action suggested by policy: "+actId+" which is "+pomdp.actions[actId].name);
+			    //System.out.print("enter action to use:");
+			    
+			    //VVVVV1: actId, actionName
+			    //cancelled: only follow recommendation at this part
+			    
+			    vc.send(pomdp.actions[actId].name);
+			    inact = vc.readLine();//this is either "", for follow the recommendation, or "ENDOPERATION", for end this thread
+			    
+			    System.out.println("SNAP: after read");
+			    if (inact.equals("ENDOPERATION")){
+			    	vc.send("SNAP end");//tell Vera it ended
+					break;
+			    }
+			    
+			    cactId = pomdp.findActionByName(inact);
+			    if (cactId >= 0) {
+			    	actId = cactId;
 			    }
 			    //System.out.println("action used: "+actId+" which is "+pomdp.actions[actId].name);
 				//VVVVV2: confirm action##actId
-				    //cancelled: follow recommadation
+				    //cancelled: follow recommendation
 				    //vc.send(actId + "");
 			    
 			    for (int o=0; o<pomdp.nObsVars; o++) {
 					obsnames[o]=pomdp.obsVars[o].valNames[1];
-					System.out.print("enter observation "+pomdp.obsVars[o].name+" ["+obsnames[o]+"]: ");
+					System.out.println("enter observation "+pomdp.obsVars[o].name+" ["+obsnames[o]+"]: ");
 					
 					//VVVVV3: observation### observe value, observe status 
-					vc.send(pomdp.obsVars[o].name + " " + obsnames[o]);
+					vc.send(pomdp.obsVars[o].name);
+					System.out.println("REACH");
 					inobs = vc.readLine();
+					System.out.println("FROM VERA: " + inobs);
 					
 					for (int k=0; k<pomdp.obsVars[o].arity; k++) {
 					    if (inobs.equalsIgnoreCase(pomdp.obsVars[o].valNames[k]))
 					    	obsnames[o]=inobs;
 					}
 			    }
-			    System.out.print("observations: ");
+			    System.out.println("observations: ");
 			    for (int o=0; o<pomdp.nObsVars; o++)
-				System.out.print(" "+obsnames[o]);
+				System.out.println(" "+obsnames[o]);
 			    System.out.println();
 			    belState = pomdp.beliefUpdate(belState,actId,obsnames);
 			    nits--;
