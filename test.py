@@ -14,13 +14,16 @@ myvera = v.Vera()
 #print myvera.get_wave_status(update=False) #get if the wave is alive
 
 #Add a switch to the network
+
 from Vera import Switch as s
 from Vera import Lock as l
 light1 = s.Switch(myvera, 14)
 lock1 = l.Lock(myvera, 11)
+"""
 #light1.info()
 myvera.comm.poll()
 #light1.poll()
+"""
 '''
 if(not light1.status()):
     light1.on()
@@ -31,6 +34,7 @@ else:
 #print light1.status()
 #print lock1.status()
 
+"""
 from time import sleep
 count = 4
 
@@ -41,4 +45,5 @@ while count > 0 and (lock1.status()):
         light1.on()
     else:
         light1.off()
-
+"""
+print lock1.status()

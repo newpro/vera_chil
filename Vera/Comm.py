@@ -90,11 +90,14 @@ class Comm:
             #http://192.168.0.100:3480/data_request?id=variableget&DeviceNum=14&serviceId=urn:upnp-org:serviceId:SwitchPower1&Variable=Status
             #service can be "SwitchPower" or "DoorLock"
             result += "id=variableget"
+            variable_name = "Status"
             if (service == "DoorLock"): #doorlock have specific service id
-                serviceId = "urn:micasaverde-com"
+                serviceId = "urn:micasaverde-com:serviceId:SecuritySensor1"
+                variable_name = "Tripped"
+                result = result + "&DeviceNum=" + _s(device_id) + "&serviceId=" + serviceId + "&Variable="+_s(variable_name)
             else :
                 serviceId = "urn:upnp-org"
-            result = result + "&DeviceNum=" + _s(device_id) + "&serviceId=" + serviceId +":serviceId:"+ _s(service) + "1&Variable=Status"
+                result = result + "&DeviceNum=" + _s(device_id) + "&serviceId=" + serviceId +":serviceId:"+ _s(service) + "1&Variable="+_s(variable_name)
         return result
     
     #--------------call specific level (wapper)-------------------
@@ -130,7 +133,10 @@ class Comm:
         return the on/off status of one device
         """
         url = self._url_gen("variableget", device_id=device_id, service=service)
+        #print "_________MARKED______"
+        #print url
         resp = requests.get(url).json()
+        #print resp
         
         if (resp == 0):
             return False
